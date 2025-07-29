@@ -39,7 +39,9 @@ podman run \
        --rm \
        --security-opt label=disable \
        -e CONAN_USER_HOME=/workspace/conan \
-       -v $PWD:/workspace/dist:rw,exec \
+       --ulimit host \
+       --pids-limit -1 \
        $VOLS \
+       -v $PWD:/workspace/dist:rw,exec \
        build_milvus_lite:$IMAGE_TAG \
        /workspace/build_milvus_lite.sh $TAG
