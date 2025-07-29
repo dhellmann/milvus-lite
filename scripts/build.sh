@@ -23,17 +23,17 @@ if [ "$#" -eq 0 ]; then
     echo "Please set dockerfile path"
 elif [ "$#" -eq 1 ]; then
     DOCKERFILE=$1
-    docker build -t build_milvus_lite:$IMAGE_TAG -f $DOCKERFILE . \
-        && docker run --rm -v $PWD:/workspace/dist build_milvus_lite:$IMAGE_TAG /workspace/build_milvus_lite.sh $TAG
+    podman build -t build_milvus_lite:$IMAGE_TAG -f $DOCKERFILE . \
+        && podman run --rm -v $PWD:/workspace/dist build_milvus_lite:$IMAGE_TAG /workspace/build_milvus_lite.sh $TAG
 elif [ "$#" -eq 2 ]; then
     DOCKERFILE=$1
     TAG=$2
-    docker build -t build_milvus_lite:$IMAGE_TAG -f $DOCKERFILE . \
-        && docker run --rm -v $PWD:/workspace/dist build_milvus_lite:$IMAGE_TAG /workspace/build_milvus_lite.sh $TAG
+    podman build -t build_milvus_lite:$IMAGE_TAG -f $DOCKERFILE . \
+        && podman run --rm -v $PWD:/workspace/dist build_milvus_lite:$IMAGE_TAG /workspace/build_milvus_lite.sh $TAG
 elif [ "$#" -eq 3 ]; then
     DOCKERFILE=$1
     TAG=$2
     CACAN_CACHE=$3
-    docker build -t build_milvus_lite:$IMAGE_TAG -f $DOCKERFILE . \
-        && docker run --rm -e CONAN_USER_HOME=/workspace/conan -v $CACAN_CACHE:/workspace/conan -v $PWD:/workspace/dist build_milvus_lite:$IMAGE_TAG /workspace/build_milvus_lite.sh $TAG
+    podman build -t build_milvus_lite:$IMAGE_TAG -f $DOCKERFILE . \
+        && podman run --rm -e CONAN_USER_HOME=/workspace/conan -v $CACAN_CACHE:/workspace/conan -v $PWD:/workspace/dist build_milvus_lite:$IMAGE_TAG /workspace/build_milvus_lite.sh $TAG
 fi
