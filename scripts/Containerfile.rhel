@@ -1,0 +1,18 @@
+FROM registry.access.redhat.com/ubi9/ubi:9.4-1214.1729773476
+
+RUN yum -y update && yum -y install git python3.12 python3.12-pip gcc-c++ cmake automake autoconf cargo atlas-devel openblas-devel
+
+RUN mkdir /work && mkdir -p /root/.cargo/bin/
+
+ENV VIRTUAL_ENV=/work/venv
+ENV PATH=/work/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+RUN python3.12 -m venv --upgrade-deps $VIRTUAL_ENV
+RUN pip install 'conan<2.0' setuptools build
+
+RUN git clone https://github.com/milvus-io/milvus-lite.git /work/milvus-lite && cd /work/milvus-lite && git submodule update --init --recursive
+
+COPY rhel_build.sh /work
+RUN chmod +x /work/rhel_build.sh
+
+ENTRYPOINT /work/rhel_build.sh
