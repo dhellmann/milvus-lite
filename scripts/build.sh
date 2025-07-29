@@ -21,28 +21,25 @@ IMAGE_TAG="latest"
 
 if [ "$#" -eq 0 ]; then
     echo "Please set dockerfile path"
-elif [ "$#" -eq 1 ]; then
-    DOCKERFILE=$1
-    podman build -t build_milvus_lite:$IMAGE_TAG -f $DOCKERFILE . \
-        && podman run --rm -v $PWD:/workspace/dist build_milvus_lite:$IMAGE_TAG /workspace/build_milvus_lite.sh $TAG
-elif [ "$#" -eq 2 ]; then
-    DOCKERFILE=$1
-    TAG=$2
-    podman build -t build_milvus_lite:$IMAGE_TAG -f $DOCKERFILE . \
-        && podman run --rm -v $PWD:/workspace/dist build_milvus_lite:$IMAGE_TAG /workspace/build_milvus_lite.sh $TAG
-elif [ "$#" -eq 3 ]; then
-    DOCKERFILE=$1
-    TAG=$2
-    CACAN_CACHE=$3
-    podman build \
-           -t build_milvus_lite:$IMAGE_TAG \
-           -f $DOCKERFILE . \
-        && podman run \
-                  --rm \
-                  --security-opt label=disable \
-                  -e CONAN_USER_HOME=/workspace/conan \
-                  -v $CACAN_CACHE:/workspace/conan \
-                  -v $PWD:/workspace/dist \
-                  build_milvus_lite:$IMAGE_TAG \
-                  /workspace/build_milvus_lite.sh $TAG
 fi
+
+DOCKERFILE=$1
+podman build -t build_milvus_lite:$IMAGE_TAG -f $DOCKERFILE .
+
+if [ "$#" -eq 2 ]; then
+    TAG=$2
+fi
+VOLS=""
+if [ "$#" -eq 3 ]; then
+    CACAN_CACHE=$3
+    VOLS="-v $CACAN_CACHE:/workspace/conan:rw,exec"
+fi
+podman run \
+       -it \
+       --rm \
+       --security-opt label=disable \
+       -e CONAN_USER_HOME=/workspace/conan \
+       -v $PWD:/workspace/dist:rw,exec \
+       $VOLS \
+       build_milvus_lite:$IMAGE_TAG \
+       /workspace/build_milvus_lite.sh $TAG
